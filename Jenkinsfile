@@ -2,6 +2,9 @@ pipeline {
     agent none
     environment{
 	DOCKER_HUB_CREDS = credentails('docker-credentials')
+	IMAGE_NAME = 'selinamjo1/jenkins/inbound-agent'
+        IMAGE_TAG = "latest"
+
     }
     stages {
         stage('Compile') {
@@ -63,6 +66,17 @@ pipeline {
             }
         }
     }
+
+ 	stage('Deploy with Ansible') {
+            environment {
+                ANSIBLE_HOST_KEY_CHECKING = 'False'
+            }
+            steps {
+                sh 'cd ansible && ansible-playbook -i inventory.ini deploy-app.yml'
+            }
+        }
+    }
+
     
     post {
         always {
