@@ -2,7 +2,7 @@
   hosts: docker_hosts
   become: yes
   vars:
-    docker_image: yourdockerhubusername/abc-retail-app
+    docker_image: selinamjo1/abc-retail-app
     docker_tag: latest
     container_name: abc-retail-app
     container_port: 8080

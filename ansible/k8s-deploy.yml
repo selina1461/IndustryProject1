@@ -2,9 +2,9 @@
   hosts: localhost
   connection: local
   vars:
-    docker_image: yourdockerhubusername/abc-retail-app
+    docker_image: selinamjo1/abc-retail-app
     docker_tag: "{{ lookup('env', 'BUILD_NUMBER') | default('latest', true) }}"
-    k8s_namespace: default
+    k8s_namespace: monitoring
   
   tasks:
     - name: Update deployment image

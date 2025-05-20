@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: abc-retail-app
-        image: yourdockerhubusername/abc-retail-app:latest
+        image: selinamjo1/abc-retail-app:latest
         ports:
         - containerPort: 8080
         resources:
