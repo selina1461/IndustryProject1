@@ -1,49 +1,53 @@
+---
+- name: Check if Docker is installed
+  command: which docker
+  register: docker_check
+  ignore_errors: yes
+  changed_when: false
+
 - name: Install required packages
-  apt:
-    name:
-      - apt-transport-https
-      - ca-certificates
-      - curl
-      - software-properties-common
-    state: present
-    update_cache: yes
+  block:
+    - name: Install required packages on Debian/Ubuntu
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
+        state: present
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+      become: yes
 
-- name: Install Docker dependencies
-  apt:
-    name: docker.io
-  state: present
-    update_cache: yes
+    - name: Notify user to install Docker on macOS
+      debug:
+        msg: "Docker needs to be installed via Docker Desktop on macOS. Please download and install from https://www.docker.com/products/docker-desktop"
+      when: ansible_os_family == "Darwin" and docker_check.rc != 0
 
-- name: Start Docker service
-  service:
+- name: Start Docker service (Linux)
+  systemd:
     name: docker
     state: started
     enabled: yes
+  when: ansible_os_family == "Debian"
+  become: yes
 
-- name: Log into Docker Hub
-  docker_login:
-    username: "{{ lookup('env', 'DOCKER_HUB_CREDS_USR') }}"
-    password: "{{ lookup('env', 'DOCKER_HUB_CREDS_PSW') }}"
-    state: present
-
-- name: Pull latest Docker image
-  docker_image:
-    name: "{{ docker_image }}:{{ docker_tag }}"
-    source: pull
-    force_source: yes
-
-- name: Stop and remove existing container if it exists
-  docker_container:
-    name: "{{ container_name }}"
-    state: absent
-    force_kill: yes
+- name: Verify Docker is running
+  command: docker info
+  register: docker_info
+  changed_when: false
   ignore_errors: yes
 
-- name: Run Docker container
+- name: Run Jenkins container
   docker_container:
-    name: "{{ container_name }}"
-    image: "{{ docker_image }}:{{ docker_tag }}"
+    name: jenkins-app
+    image: jenkins/jenkins:lts
     state: started
     restart_policy: always
-    ports:
-      - "{{ host_port }}:{{ container_port }}"
+    published_ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+  when: docker_info.rc == 0

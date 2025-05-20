@@ -1,24 +1,27 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: abc-retail-app
+  name: jenkins
   labels:
-    app: abc-retail-app
+    app: jenkins
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
-      app: abc-retail-app
+      app: jenkins
   template:
     metadata:
       labels:
-        app: abc-retail-app
+        app: jenkins
     spec:
       containers:
-      - name: abc-retail-app
-        image: selinamjo1/abc-retail-app:latest
+      - name: jenkins
+        image: selinamjo1/jenkins:latest
         ports:
         - containerPort: 8080
+        env:
+        - name: JENKINS_OPTS
+          value: "--httpPort=8080"
         resources:
           limits:
             cpu: "500m"
@@ -27,14 +30,20 @@ spec:
             cpu: "200m"
             memory: "256Mi"
         readinessProbe:
-          httpGet:
-            path: /
+          tcpSocket:
             port: 8080
-          initialDelaySeconds: 30
+            host: localhost
+          initialDelaySeconds: 90
           periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 5
+          successThreshold: 1
         livenessProbe:
           httpGet:
-            path: /
+            path: /login
             port: 8080
-          initialDelaySeconds: 60
-          periodSeconds: 15
+            host: localhost
+          initialDelaySeconds: 120
+          periodSeconds: 20
+          timeoutSeconds: 5 
+          failureThreshold: 3

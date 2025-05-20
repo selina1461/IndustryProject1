@@ -3,7 +3,7 @@ pipeline {
     environment{
 	DOCKER_HUB_CREDS = credentails('docker-credentials')
 	KUBECONFIG = credentials('kubeconfig-credentials')
-	IMAGE_NAME = 'selinamjo1/jenkins/inbound-agent'
+	IMAGE_NAME = 'selinamjo1/jenkins'
         IMAGE_TAG = "latest"
 
     }
@@ -53,8 +53,8 @@ pipeline {
         stage('Build Docker Image') {
             agent { label 'docker-agent' } 
             steps {
-                sh 'docker build -t jenkins/inbound-agent:latest .' 
-                sh 'docker tag jenkins/inbound-agent:latest jenkins/inbound-agent:latest' 
+                sh 'docker build -t jenkins:latest .' 
+                sh 'docker tag jenkins:latest jenkins:latest' 
             }
         }
         
@@ -62,8 +62,8 @@ pipeline {
             agent { label 'docker-agent' }  
             steps {
                 sh 'echo $DOCKER_HUB_CREDS_PSW | docker login -u $DOCKER_HUB_CREDS_USR --password-stdin'
-                sh 'docker push jenkins/inbound-agent:latest'  
-                sh 'docker push jenkins/inbound-agent:latest'  
+                sh 'docker push jenkins:latest'  
+                sh 'docker push jenkins:latest'  
             }
         }
     }
