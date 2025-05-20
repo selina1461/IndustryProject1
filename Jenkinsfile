@@ -2,6 +2,7 @@ pipeline {
     agent none
     environment{
 	DOCKER_HUB_CREDS = credentails('docker-credentials')
+	KUBECONFIG = credentials('kubeconfig-credentials')
 	IMAGE_NAME = 'selinamjo1/jenkins/inbound-agent'
         IMAGE_TAG = "latest"
 
@@ -75,6 +76,14 @@ pipeline {
                 sh 'cd ansible && ansible-playbook -i inventory.ini deploy-app.yml'
             }
         }
+	 stage('Deploy to Kubernetes') {
+            steps {
+                sh 'mkdir -p ~/.kube'
+                sh 'cat $KUBECONFIG > ~/.kube/config'
+                sh 'cd ansible && ansible-playbook k8s-deploy.yml'
+            }
+        }
+
     }
 
     
@@ -82,6 +91,7 @@ pipeline {
         always {
             node('docker-agent') {  
                 sh 'docker logout'
+		 sh 'rm -f ~/.kube/config'
             }
         }
     }

@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: abc-retail-app
+  labels:
+    app: abc-retail-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: abc-retail-app
+  template:
+    metadata:
+      labels:
+        app: abc-retail-app
+    spec:
+      containers:
+      - name: abc-retail-app
+        image: yourdockerhubusername/abc-retail-app:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+          requests:
+            cpu: "200m"
+            memory: "256Mi"
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 15

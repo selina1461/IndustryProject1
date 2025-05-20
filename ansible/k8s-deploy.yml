@@ -1,0 +1,23 @@
+- name: Deploy ABC Retail App to Kubernetes
+  hosts: localhost
+  connection: local
+  vars:
+    docker_image: yourdockerhubusername/abc-retail-app
+    docker_tag: "{{ lookup('env', 'BUILD_NUMBER') | default('latest', true) }}"
+    k8s_namespace: default
+  
+  tasks:
+    - name: Update deployment image
+      command: kubectl set image deployment/abc-retail-app abc-retail-app={{ docker_image }}:{{ docker_tag }} -n {{ k8s_namespace }}
+      ignore_errors: yes
+    
+    - name: Create Kubernetes resources if not exist
+      command: kubectl apply -f kubernetes/manifests -n {{ k8s_namespace }}
+      when: update_result is failed
+      
+    - name: Wait for deployment to be ready
+      command: kubectl rollout status deployment/abc-retail-app -n {{ k8s_namespace }}
+      register: rollout_status
+      until: rollout_status.rc == 0
+      retries: 20
+      delay: 10
