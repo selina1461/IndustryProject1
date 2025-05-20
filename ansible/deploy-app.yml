@@ -1,0 +1,12 @@
+- name: Deploy ABC Retail App Container
+  hosts: docker_hosts
+  become: yes
+  vars:
+    docker_image: yourdockerhubusername/abc-retail-app
+    docker_tag: latest
+    container_name: abc-retail-app
+    container_port: 8080
+    host_port: 80
+
+  roles:
+    - docker-deploy
