@@ -83,10 +83,14 @@ pipeline {
                 sh 'cd ansible && ansible-playbook k8s-deploy.yml'
             }
         }
+    stage('Deploy Monitoring Stack') {
+            steps {
+                sh 'cd ansible && ansible-playbook monitoring-deploy.yml'
+            }
+        }
 
     }
 
-    
     post {
         always {
             node('docker-agent') {  

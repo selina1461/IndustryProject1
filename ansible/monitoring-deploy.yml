@@ -1,0 +1,22 @@
+- name: Deploy Monitoring Stack to Kubernetes
+  hosts: localhost
+  connection: local
+  vars:
+    k8s_namespace: monitoring
+  
+  tasks:
+    - name: Create monitoring namespace
+      command: kubectl create namespace {{ k8s_namespace }} --dry-run=client -o yaml | kubectl apply -f -
+    
+    - name: Deploy monitoring stack
+      command: kubectl apply -f kubernetes/manifests/prometheus-config.yaml -f kubernetes/manifests/prometheus.yaml -f kubernetes/manifests/node-exporter.yaml -f kubernetes/manifests/grafana.yaml -n {{ k8s_namespace }}
+      
+    - name: Wait for deployments to be ready
+  command: kubectl rollout status deployment/{{ item }} -n {{ k8s_namespace }}
+      with_items:
+        - prometheus
+        - grafana
+      register: rollout_status
+      until: rollout_status.rc == 0
+      retries: 20
+      delay: 10
