@@ -1,48 +1,18 @@
-jenkins_agent_key_new
-jenkins_agent_key_new.pub
 # OS generated files
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
 
-# Compiled files
-*.class
-*.jar
-*.war
-*.ear
-*.zip
-*.tar.gz
-*.rar
+# Jenkins binaries
+jenkins.war
+agent.jar
 
-# Log files
-*.log
-*.out
+# SSH keys
+jenkins_agent_key
+jenkins_agent_key.pub
+jenkins_agent_key_new
+jenkins_agent_key_new.pub
 
-# Sensitive files
+# Wildcards to catch similar files
 *_key
 *_key.*
-*.pem
-*.key
-*.p12
-*.pfx
-*.jks
-*.keystore
-
-# IDE files
-.idea/
-*.iml
-.vscode/
-*.sublime-*
-.project
-.classpath
-.settings/
-
-# Build directories
-target/
-build/
-dist/
-node_modules/
+*.war
+*.jar
